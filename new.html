@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STYLESPHERE AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Montserrat',sans-serif;}
+body{background:#000;overflow:hidden;color:white;}
+
+/* ================= INTRO ================= */
+
+.intro{
+position:fixed;width:100%;height:100vh;
+background:radial-gradient(circle at center,#000 0%,#111 70%,#000 100%);
+display:flex;justify-content:center;align-items:center;
+z-index:9999;transition:opacity 1s ease;
+}
+
+.brand{display:flex;gap:10px;font-size:65px;font-weight:900;letter-spacing:10px;}
+.brand.glow{text-shadow:0 0 8px rgba(255,255,255,0.7),0 0 16px rgba(255,215,0,0.4);}
+.letter{opacity:0;filter:blur(15px);display:inline-block;animation:letterReveal 1.5s forwards ease;}
+@keyframes letterReveal{to{opacity:1;transform:translate(0,0);filter:blur(0);}}
+
+/* ================= MAIN ================= */
+
+.main-content{
+display:none;height:100vh;overflow-y:scroll;
+scroll-snap-type:y mandatory;scroll-behavior:smooth;
+}
+
+.hero,.carousel-section{scroll-snap-align:start;}
+
+nav{
+display:flex;justify-content:space-between;
+padding:20px 60px;background:#000;
+position:sticky;top:0;z-index:5000;
+}
+
+.hero{
+height:100vh;display:flex;justify-content:center;align-items:center;
+background:linear-gradient(135deg,#000,#1a1a1a,#111);
+text-align:center;padding:20px;position:relative;
+}
+
+.hero-content{max-width:800px;width:100%;}
+
+.hero h1{font-size:48px;margin-bottom:20px;}
+
+.ai-glow{
+background:linear-gradient(90deg,#ffffff,#ffd700,#ffffff);
+background-size:200% 200%;
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+animation:aiColorMove 6s infinite linear;
+}
+@keyframes aiColorMove{
+0%{background-position:0% 50%;}
+100%{background-position:100% 50%;}
+}
+
+.hero p{font-size:18px;line-height:1.6;color:#ccc;margin-bottom:30px;}
+.hero-features{display:flex;flex-direction:column;gap:10px;font-size:16px;color:#aaa;}
+
+.camera-btn{
+padding:12px 28px;font-size:16px;border:none;border-radius:30px;
+background:linear-gradient(90deg,#fff,#ffd700);
+cursor:pointer;font-weight:700;margin-top:15px;
+}
+
+.preview img{max-width:220px;border-radius:10px;margin-top:15px;}
+
+video{display:none;width:260px;margin-top:15px;border-radius:12px;}
+
+.capture-btn{
+display:none;margin-top:10px;padding:10px 20px;
+border:none;border-radius:20px;background:#ffd700;cursor:pointer;
+}
+
+/* Scroll */
+
+.scroll-up{
+position:fixed;bottom:30px;right:30px;
+background:#ffd700;color:#000;
+padding:12px 15px;border-radius:50%;
+cursor:pointer;display:none;font-weight:bold;
+z-index:6000;
+}
+
+.scroll-down{
+position:absolute;bottom:25px;left:50%;
+transform:translateX(-50%);
+color:#aaa;cursor:pointer;font-size:14px;
+}
+
+/* ================= CAROUSEL ================= */
+
+.carousel-section{
+height:100vh;display:flex;justify-content:center;align-items:center;
+background:linear-gradient(135deg,#111,#1a1a1a,#000);
+}
+
+.carousel{
+position:relative;width:80vw;height:70vh;
+display:flex;justify-content:center;align-items:center;
+}
+
+.card{
+position:absolute;width:60%;height:100%;
+transition:all 1s ease;opacity:0.6;transform:scale(0.6);
+cursor:pointer;
+}
+
+.card img{width:100%;height:100%;object-fit:contain;}
+
+.card.left{transform:translateX(-60%) scale(0.6);}
+.card.center{transform:translateX(0) scale(1);opacity:1;z-index:3;}
+.card.right{transform:translateX(60%) scale(0.6);}
+
+/* ================= SECOND UI ================= */
+
+.new-ui{
+position:fixed;top:0;right:-100%;
+width:100%;height:100vh;background:#000;
+display:flex;flex-direction:column;justify-content:center;align-items:center;
+transition:right 0.8s ease;z-index:10000;
+}
+
+.new-ui.active{right:0;}
+
+.back-btn{
+position:absolute;top:20px;left:30px;cursor:pointer;
+}
+
+.style-camera{
+position:absolute;
+top:20px;
+right:20px;
+width:140px;
+height:45px;
+border:none;
+border-radius:25px;
+background:linear-gradient(90deg,#fff,#ffd700);
+cursor:pointer;
+font-weight:bold;
+font-size:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.second-video{
+display:none;width:260px;border-radius:12px;margin-top:15px;
+}
+
+.second-capture{
+display:none;margin-top:10px;padding:10px 20px;
+border:none;border-radius:20px;background:#ffd700;cursor:pointer;
+}
+
+/* ================= MODALS ================= */
+
+.modal{
+position:fixed;
+top:0;left:0;
+width:100%;height:100vh;
+background:rgba(0,0,0,0.95);
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:20000;
+text-align:center;
+}
+
+.modal button{
+margin:10px;
+padding:12px 30px;
+border:none;
+border-radius:25px;
+font-size:16px;
+cursor:pointer;
+background:linear-gradient(90deg,#fff,#ffd700);
+}
+/* ================= AI RESULT POPUP ================= */
+
+.result-popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:rgba(0,0,0,0.85);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:30000;
+animation:fadeIn 0.4s ease;
+}
+
+.result-box{
+background:#111;
+padding:40px;
+border-radius:20px;
+width:90%;
+max-width:420px;
+text-align:center;
+box-shadow:0 0 30px rgba(255,215,0,0.3);
+animation:scaleUp 0.4s ease;
+}
+
+.result-box h2{
+margin-bottom:15px;
+background:linear-gradient(90deg,#fff,#ffd700);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.result-box p{
+margin:8px 0;
+color:#ccc;
+font-size:15px;
+}
+
+.result-close{
+margin-top:20px;
+padding:10px 25px;
+border:none;
+border-radius:25px;
+background:linear-gradient(90deg,#fff,#ffd700);
+cursor:pointer;
+font-weight:bold;
+}
+
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+
+@keyframes scaleUp{
+from{transform:scale(0.7);}
+to{transform:scale(1);}
+}
+.result-popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100vh;
+background:rgba(0,0,0,0.85);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:30000;
+}
+
+.result-box{
+background:#111;
+padding:35px;
+border-radius:20px;
+width:90%;
+max-width:400px;
+text-align:center;
+box-shadow:0 0 25px rgba(255,215,0,0.4);
+animation:scaleIn 0.3s ease;
+}
+
+.result-close{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:linear-gradient(90deg,#fff,#ffd700);
+cursor:pointer;
+font-weight:bold;
+}
+
+@keyframes scaleIn{
+from{transform:scale(0.8);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div class="intro" id="intro">
+<div class="brand glow" id="brand"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content" id="mainContent">
+
+<nav id="mainNav">
+<h2>STYLESPHERE AI</h2>
+<div>Home | AI Stylist | Help</div>
+</nav>
+
+<section class="hero">
+<div class="hero-content">
+
+<h1><span class="ai-glow">AI</span> That Understands Your Style</h1>
+<p id="typingText"></p>
+
+<div class="hero-features">
+<span>✔ Personalized Style Suggestions</span>
+<span>✔ Based on Your Uploaded Image</span>
+<span>✔ Smart AI Analysis</span>
+</div>
+
+<button class="camera-btn" onclick="askPermission('first')">📷 Upload Your Image</button>
+
+<video id="video" autoplay playsinline></video>
+<button id="captureBtn" class="capture-btn" onclick="captureImage()">Capture</button>
+
+<div class="preview" id="preview"></div>
+
+<div class="scroll-down" onclick="scrollDown()">Scroll Down ↓</div>
+
+</div>
+</section>
+
+<section class="carousel-section">
+<div class="carousel">
+
+<div class="card left" onclick="window.location.href='casualwear.html'">
+  <img src="casualwear.jpeg">
+</div>
+
+<div class="card center" onclick="window.location.href='oldmoney.html'">
+  <img src="oldmoney.jpeg">
+</div>
+
+<div class="card right" onclick="window.location.href='streetwear.html'">
+  <img src="streetwear.jpeg">
+</div>
+
+</div>
+</section>
+
+</section>
+
+</div>
+
+<div class="scroll-up" id="scrollUp" onclick="scrollTop()">↑</div>
+
+<!-- SECOND UI -->
+<div class="new-ui" id="newUI">
+<div class="back-btn" onclick="closeNewUI()">← Back</div>
+<button class="style-camera" onclick="askPermission('second')">📷 Camera</button>
+<h1 id="newTitle"></h1>
+<video id="secondVideo" class="second-video" autoplay playsinline></video>
+<button id="secondCapture" class="second-capture" onclick="captureSecond()">Capture</button>
+</div>
+
+<!-- PERMISSION MODAL -->
+<div class="modal" id="permissionModal">
+<h2>Allow Camera & Gallery Access?</h2>
+<button onclick="grantPermission()">Yes</button>
+<button onclick="closePermission()">No</button>
+</div>
+
+<!-- OPTION MODAL -->
+<div class="modal" id="optionModal">
+<h2>Select Option</h2>
+<button onclick="openCamera()">📷 Open Camera</button>
+<button onclick="openGallery()">🖼 Open Gallery</button>
+<button onclick="closeOption()">Cancel</button>
+<input type="file" id="galleryInput" accept="image/*" style="display:none" onchange="handleGallery(event)">
+</div>
+
+<script>
+    async function uploadToFirebase(blob) {
+
+  preview.innerHTML += "<p>⬆ Uploading image...</p>";
+
+  const fileName = "user_" + Date.now() + ".jpg";
+
+  const storageRef = ref(storage, "uploads/" + fileName);
+
+  await uploadBytes(storageRef, blob);
+
+  const imageUrl = await getDownloadURL(storageRef);
+
+  console.log("Image URL:", imageUrl);
+
+  analyzeWithAI(imageUrl);
+}
+
+
+/* INTRO */
+const video=document.getElementById("video");
+const captureBtn=document.getElementById("captureBtn");
+const preview=document.getElementById("preview");
+
+const text="STYLESPHERE AI";
+const directions=["translateX(-300px)","translateX(300px)","translateY(-200px)","translateY(200px)"];
+
+text.split("").forEach((char,index)=>{
+const span=document.createElement("span");
+span.classList.add("letter");
+span.textContent=char;
+span.style.transform=directions[Math.floor(Math.random()*directions.length)];
+span.style.animationDelay=`${index*0.18}s`;
+brand.appendChild(span);
+});
+
+setTimeout(()=>{
+intro.style.opacity="0";
+setTimeout(()=>{
+intro.style.display="none";
+mainContent.style.display="block";
+document.body.style.overflow="auto";
+},1000);
+},4200);
+
+/* Typing */
+const typingText=document.getElementById("typingText");
+const message="Upload your image and let our AI analyze your personality and recommend the fashion style that truly suits YOU.";
+let i=0;(function type(){if(i<message.length){typingText.textContent+=message.charAt(i);i++;setTimeout(type,25);}})();
+
+/* Scroll */
+mainContent.addEventListener("scroll",()=>{
+scrollUp.style.display=mainContent.scrollTop>200?"block":"none";
+});
+function scrollTop(){mainContent.scrollTo({top:0,behavior:"smooth"});}
+function scrollDown(){mainContent.scrollTo({top:window.innerHeight,behavior:"smooth"});}
+
+/* UI */
+function openNewUI(title){
+mainNav.style.display="none";
+newTitle.textContent=title+" Collection";
+newUI.classList.add("active");
+}
+function closeNewUI(){
+mainNav.style.display="flex";
+newUI.classList.remove("active");
+}
+
+/* PERMISSION SYSTEM */
+
+let currentMode="first";
+
+function askPermission(mode){
+currentMode=mode;
+permissionModal.style.display="flex";
+}
+
+function closePermission(){
+permissionModal.style.display="none";
+}
+
+function grantPermission(){
+permissionModal.style.display="none";
+optionModal.style.display="flex";
+}
+
+function closeOption(){
+optionModal.style.display="none";
+}
+
+/* CAMERA & GALLERY */
+
+async function openCamera(){
+closeOption();
+if(currentMode==="first"){
+startCamera();
+}else{
+startSecondCamera();
+}
+}
+
+function openGallery(){
+closeOption();
+galleryInput.click();
+}
+function handleGallery(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+
+    if(currentMode === "first"){
+
+      preview.innerHTML = `<img src="${e.target.result}">`;
+
+      // Hide camera elements
+      video.style.display = "none";
+      captureBtn.style.display = "none";
+
+      // Send to AI
+      analyzeWithAI(file);
+
+    }else{
+
+      secondVideo.style.display = "none";
+      secondCapture.style.display = "none";
+    }
+
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+
+/* First Camera */
+let stream;
+async function startCamera(){
+stream=await navigator.mediaDevices.getUserMedia({video:true});
+video.srcObject=stream;
+video.style.display="block";
+captureBtn.style.display="inline-block";
+}
+async function captureImage() {
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  stream.getTracks().forEach(t => t.stop());
+
+  video.style.display = "none";
+  captureBtn.style.display = "none";
+
+  canvas.toBlob(function(blob){
+
+    const imageUrl = URL.createObjectURL(blob);
+    preview.innerHTML = `<img src="${imageUrl}">`;
+
+    analyzeWithAI(blob);
+
+  }, "image/jpeg");
+}
+
+
+/* Second Camera */
+let secondStream;
+async function startSecondCamera(){
+secondStream=await navigator.mediaDevices.getUserMedia({video:true});
+secondVideo.srcObject=secondStream;
+secondVideo.style.display="block";
+secondCapture.style.display="inline-block";
+}
+function captureSecond(){
+secondStream.getTracks().forEach(t=>t.stop());
+secondVideo.style.display="none";
+secondCapture.style.display="none";
+}
+
+/* Carousel */
+let cards=document.querySelectorAll(".card");
+setInterval(()=>{
+cards.forEach(card=>{
+if(card.classList.contains("left")) card.classList.replace("left","center");
+else if(card.classList.contains("center")) card.classList.replace("center","right");
+else card.classList.replace("right","left");
+});
+},3000);
+async function analyzeWithAI(file){
+
+  preview.innerHTML += "<p>🤖 AI is analyzing your style...</p>";
+
+  try {
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    const parsedResult = JSON.parse(data.result);
+
+    showResult(parsedResult);
+
+  } catch(error) {
+
+    const result = {
+      body_type: "Rectangle",
+      skin_tone: "Warm",
+      colors: ["Olive", "Brown", "Mustard"],
+      style: "Smart Casual"
+    };
+
+    showResult(result);
+  }
+}
+function showResult(data){
+
+  const popup = document.getElementById("resultPopup");
+  const box = document.getElementById("resultBox");
+
+  box.innerHTML = `
+    <h2>✨ AI Style Result</h2>
+    <p><b>Body Type:</b> ${data.body_type}</p>
+    <p><b>Skin Tone:</b> ${data.skin_tone}</p>
+    <p><b>Best Colors:</b> ${data.colors.join(", ")}</p>
+    <p><b>Recommended Style:</b> ${data.style}</p>
+    <button class="result-close" onclick="closeResult()">Close</button>
+  `;
+
+  popup.style.display = "flex";
+}
+
+function closeResult(){
+  document.getElementById("resultPopup").style.display = "none";
+}
+
+
+function closeResult(){
+  document.getElementById("resultPopup").style.display="none";
+}
+
+
+</script>
+<!-- AI RESULT POPUP -->
+<div class="result-popup" id="resultPopup">
+  <div class="result-box" id="resultBox">
+    <!-- Result will be injected here -->
+  </div>
+</div>
+<div class="result-popup" id="resultPopup">
+  <div class="result-box" id="resultBox"></div>
+</div>
+
+
+</body>
+</html>
